@@ -1,0 +1,1 @@
+export type SelectKind = 'post-type' | 'taxonomy-type' | 'post' | 'taxonomy';
