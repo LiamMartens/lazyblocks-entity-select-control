@@ -1,0 +1,46 @@
+name: Build & deploy
+
+on:
+  push:
+    branches: [master]
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - run: yarn install
+      - run: yarn build
+      - uses: papeloto/action-zip@v1
+        with:
+          files: dist/
+          dest: plugin.zip
+          recursive: false
+      - uses: actions/upload-artifact@v2
+        with:
+          name: plugin
+          path: |
+            plugin.zip
+      - name: get-npm-version
+        id: package_version
+        uses: martinbeentjes/npm-get-version-action@master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release_${{ steps.package_version.outputs.current-version}}
+          release_name: Release ${{ steps.package_version.outputs.current-version}}
+      - name: Upload Release Asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./plugin.zip
+          asset_name: plugin.zip
+          asset_content_type: application/zip
