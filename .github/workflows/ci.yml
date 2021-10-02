@@ -13,11 +13,11 @@ jobs:
           node-version: 14.x
       - run: yarn install
       - run: yarn build
-      - uses: papeloto/action-zip@v1
+      - uses: thedoctor0/zip-release@master
         with:
-          files: dist/ package.json
-          dest: plugin.zip
-          recursive: false
+          type: 'zip'
+          filname: 'plugin.zip'
+          path: './dist'
       - uses: actions/upload-artifact@v2
         with:
           name: plugin
