@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { ControlOptions, SelectOption } from '../types';
 import { BaseControl, SelectControl } from '@wordpress/components';
-import { useTerms } from '../hooks';
+import { useCurrentPost, useTerms } from '../hooks';
 import { forceArray, forceSingularValue, getMultiSelectHeight } from '../utils';
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
 }
 
 export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) => {
+  const currentPost = useCurrentPost();
   const terms = useTerms(data.select_type ?? 'category');
   const normalizedValue = React.useMemo(() => {
     if (value) {
@@ -23,7 +24,12 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
     return '';
   }, [value]);
   const options = React.useMemo(() => {
-    const options = terms?.map<SelectOption>(term => ({
+    const options = terms?.filter((entry) => {
+      if (data.select_filter) {
+        return !!eval(data.select_filter);
+      }
+      return true;
+    }).map<SelectOption>(term => ({
       disabled: false,
       label: term.name,
       value: String(term.id),
@@ -36,7 +42,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
       });
     }
     return options;
-  }, [data.allow_null, terms]);
+  }, [data.allow_null, data.select_filter, terms, currentPost]);
 
   const onSingleValueChange = React.useCallback((value: string) => {
     onChange(value ? parseInt(value, 10) : -1);

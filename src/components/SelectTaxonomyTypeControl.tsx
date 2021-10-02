@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { ControlOptions, SelectOption, Value } from '../types';
 import { BaseControl, SelectControl } from '@wordpress/components';
-import { useTaxonomyTypes } from '../hooks';
+import { useCurrentPost, useTaxonomyTypes } from '../hooks';
 import { forceArray, forceSingularValue, getMultiSelectHeight } from '../utils';
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
 }
 
 export const SelectTaxonomyTypeControl: React.FC<Props> = ({ value, data, onChange }) => {
+  const currentPost = useCurrentPost();
   const taxonomies = useTaxonomyTypes();
   const normalizedValue = React.useMemo(() => {
     if (value) {
@@ -23,7 +24,12 @@ export const SelectTaxonomyTypeControl: React.FC<Props> = ({ value, data, onChan
     return '';
   }, [value]);
   const options = React.useMemo(() => {
-    const options = taxonomies?.map<SelectOption>(type => ({
+    const options = taxonomies?.filter((entry) => {
+      if (data.select_filter) {
+        return !!eval(data.select_filter);
+      }
+      return true;
+    }).map<SelectOption>(type => ({
       disabled: false,
       label: type.name,
       value: type.slug,
@@ -36,7 +42,7 @@ export const SelectTaxonomyTypeControl: React.FC<Props> = ({ value, data, onChan
       });
     }
     return options;
-  }, [data.allow_null, taxonomies]);
+  }, [data.allow_null, data.select_filter, taxonomies, currentPost]);
 
   return (
     <BaseControl

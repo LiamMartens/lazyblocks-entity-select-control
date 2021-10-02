@@ -26,7 +26,7 @@ export const SelectPostControl: React.FC<Props> = ({ value, data, onChange }) =>
   const options = React.useMemo(() => {
     const options = posts?.filter((entry) => {
       if (data.select_filter) {
-        return eval(data.select_filter);
+        return !!eval(data.select_filter);
       }
       return true;
     }).map<SelectOption>(post => ({

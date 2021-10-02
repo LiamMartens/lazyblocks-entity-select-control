@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { ControlOptions, SelectOption } from '../types';
 import { BaseControl, SelectControl } from '@wordpress/components';
-import { usePostTypes } from '../hooks';
+import { useCurrentPost, usePostTypes } from '../hooks';
 import { forceArray, forceSingularValue, getMultiSelectHeight } from '../utils';
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
 }
 
 export const SelectPostTypeControl: React.FC<Props> = ({ value, data, onChange }) => {
+  const currentPost = useCurrentPost();
   const postTypes = usePostTypes();
   const normalizedValue = React.useMemo(() => {
     if (value) {
@@ -23,7 +24,12 @@ export const SelectPostTypeControl: React.FC<Props> = ({ value, data, onChange }
     return '';
   }, [value]);
   const options = React.useMemo(() => {
-    const options = postTypes?.map<SelectOption>(type => ({
+    const options = postTypes?.filter((entry) => {
+      if (data.select_filter) {
+        return !!eval(data.select_filter);
+      }
+      return true;
+    }).map<SelectOption>(type => ({
       disabled: false,
       label: type.label,
       value: type.name,
@@ -36,7 +42,7 @@ export const SelectPostTypeControl: React.FC<Props> = ({ value, data, onChange }
       });
     }
     return options;
-  }, [data.allow_null, postTypes]);
+  }, [data.allow_null, data.select_filter, postTypes, currentPost]);
 
   return (
     <BaseControl
