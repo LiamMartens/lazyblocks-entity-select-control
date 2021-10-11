@@ -50,8 +50,9 @@ export const Settings: React.FC<Props> = ({ updateData, data }) => {
 
   React.useEffect(() => {
     if (!!selectTypeOptions?.length) {
+      const isPossibleOption = !!selectTypeOptions.find(opt => opt.value === data.select_type);
       const firstOption = selectTypeOptions[0];
-      if (firstOption.value !== data.select_type) {
+      if (!isPossibleOption && firstOption) {
         updateData({ select_type: firstOption.value });
       }
     } else if (!!data.select_type) {
