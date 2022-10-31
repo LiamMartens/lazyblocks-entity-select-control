@@ -23,7 +23,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
       return true;
     }).map(term => ({
       label: term.name,
-      value: String(term.id),
+      value: term.id,
     })) ?? [];
     return options;
   }, [data.allow_null, data.select_filter, terms, currentPost]);
@@ -38,6 +38,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
       label={data.label}
     >
       <SelectControl
+        numeric
         label={__('Select term', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}

@@ -39,6 +39,7 @@ export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, on
       label={data.label}
     >
       <SelectControl
+        numeric
         label={__('Select post', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}
