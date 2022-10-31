@@ -42,6 +42,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
         label={__('Select term', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}
+        createLink={`/wp-admin/edit-tags.php?taxonomy=${data.select_type}`}
         value={value}
         options={options}
         onChange={handleChange}

@@ -43,6 +43,7 @@ export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, on
         label={__('Select post', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}
+        createLink={`/wp-admin/post-new.php?post_type=${data.select_type}`}
         value={value}
         options={options}
         onChange={handleChange}

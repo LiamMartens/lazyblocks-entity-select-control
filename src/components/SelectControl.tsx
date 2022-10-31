@@ -7,6 +7,7 @@ import type { Value } from '../types'
 type Props = {
   numeric?: boolean
   allowNull?: boolean
+  createLink?: string
   multiple?: boolean
   label?: string
   value?: Value
@@ -20,6 +21,7 @@ type Props = {
 export const SelectControl = ({
   numeric,
   allowNull,
+  createLink,
   multiple,
   label,
   value,
@@ -56,20 +58,49 @@ export const SelectControl = ({
     onChange([...normalizedValue, EMPTY_VALUE]);
   }, [onChange])
 
+  const handleRemove = useCallback((index: number) => {
+    const nextValue = [...normalizedValue]
+    nextValue.splice(index, 1)
+    onChange(nextValue)
+  }, [onChange])
+
   return (
     <Flex direction="column">
       {normalizedValue.map((value, index) => (
-        <ComboboxControl
+        <div
           key={index}
-          label={label}
-          value={typeof value === 'number' ? String(value) : ''}
-          allowReset={allowNull}
-          options={comboboxOptions}
-          onChange={v => handleChange(v, index)}
-        />
+          style={{
+            display: 'grid',
+            gap: '0.5rem',
+            gridTemplateColumns: 'minmax(0, 1fr) auto',
+            alignItems: 'flex-end',
+          }}
+        >
+          <ComboboxControl
+            label={label}
+            value={typeof value === 'number' ? String(value) : ''}
+            allowReset={allowNull}
+            options={comboboxOptions}
+            onChange={v => handleChange(v, index)}
+          />
+          {multiple && (
+            <Button
+              isDestructive
+              isSmall
+              style={{ marginBottom: '0.7rem' }}
+              variant="secondary"
+              onClick={() => handleRemove(index)}
+            >
+              {__('Remove', '@@text_domain')}
+            </Button>
+          )}
+        </div>
       ))}
-      <Flex>
-        <Button isPrimary isSmall onClick={handleAdd}>{__('Add', '@@text_domain')}</Button>
+      <Flex gap={2}>
+        <Button variant="primary" isSmall onClick={handleAdd}>{__('Add', '@@text_domain')}</Button>
+        {!!createLink && (
+          <Button variant="secondary" isSmall href={createLink}>{__('Create new', '@@text_domain')}</Button>
+        )}
       </Flex>
     </Flex>
   )
