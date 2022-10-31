@@ -12,6 +12,7 @@ const wpGlobals = {
   '@wordpress/components': 'wp.components',
   '@wordpress/elements': 'wp.elements',
   '@wordpress/hooks': 'wp.hooks',
+  '@wordpress/core-data': 'wp.coreData',
 }
 
 const replaceValues = {

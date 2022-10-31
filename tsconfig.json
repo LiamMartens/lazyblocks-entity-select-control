@@ -12,6 +12,7 @@
     "jsx": "react"
   },
   "include": [
+    "*.d.ts",
     "./src"
   ],
   "exclude": [

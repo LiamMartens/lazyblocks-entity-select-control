@@ -1,1 +1,1 @@
-export type Value = string | number | string[] | number[];
+export type Value = string | number | (string | number)[]

@@ -1,4 +1,5 @@
 import { useSelect } from '@wordpress/data';
+import { store } from '@wordpress/core-data';
 
 type PostTypeKind = {
   kind: 'postType';
@@ -8,7 +9,7 @@ type PostTypeKind = {
 
 export const usePostTypes = () => {
   const entities = useSelect(select => (
-    select('core').getEntitiesByKind('postType') as (PostTypeKind[] | null)
-  ));
+    select(store).getEntitiesByKind('postType') as (PostTypeKind[] | null)
+  ), []);
   return entities;
 }

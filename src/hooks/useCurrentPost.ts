@@ -3,6 +3,8 @@ import { Post } from '../types';
 
 export const useCurrentPost = () => {
   return useSelect((select) => (
-    select('core/editor').getCurrentPost() as Post<string>
-  ));
+    (select('core/editor') as {
+      getCurrentPost: () => Post<string>
+    }).getCurrentPost()
+  ), []);
 }

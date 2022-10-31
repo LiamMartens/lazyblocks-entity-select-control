@@ -1,4 +1,5 @@
 import { useSelect } from '@wordpress/data';
+import { store } from '@wordpress/core-data';
 
 type TaxonomyType = {
   name: string;
@@ -7,7 +8,7 @@ type TaxonomyType = {
 
 export const useTaxonomyTypes = () => {
   const types = useSelect(select => (
-    select('core').getEntityRecords('root', 'taxonomy', { per_page: -1 }) as (TaxonomyType[] | null)
-  ));
+    select(store).getEntityRecords('root', 'taxonomy', { per_page: -1 }) as (TaxonomyType[] | null)
+  ), []);
   return types;
 }

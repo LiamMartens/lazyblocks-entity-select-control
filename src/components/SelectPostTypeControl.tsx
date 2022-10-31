@@ -1,71 +1,51 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { ControlOptions, SelectOption } from '../types';
-import { BaseControl, SelectControl } from '@wordpress/components';
+import { ControlOptions, Value } from '../types';
+import { BaseControl } from '@wordpress/components';
 import { useCurrentPost, usePostTypes } from '../hooks';
-import { forceArray, forceSingularValue, getMultiSelectHeight } from '../utils';
+import { SelectControl } from './SelectControl';
 
 type Props = {
-  value: string | string[] | number | number[];
+  value: Value;
   data: ControlOptions;
-  onChange: (value: string | string[]) => void;
+  onChange: (value: Value) => void;
 }
 
 export const SelectPostTypeControl: React.FC<Props> = ({ value, data, onChange }) => {
   const currentPost = useCurrentPost();
   const postTypes = usePostTypes();
-  const normalizedValue = React.useMemo(() => {
-    if (value) {
-      if (Array.isArray(value)) {
-        return value.map(v => typeof v === 'string' ? v : String(v));
-      }
-      return String(value);
-    }
-    return '';
-  }, [value]);
+
   const options = React.useMemo(() => {
     const options = postTypes?.filter((entry) => {
       if (data.select_filter) {
         return !!eval(data.select_filter);
       }
       return true;
-    }).map<SelectOption>(type => ({
-      disabled: false,
+    }).map(type => ({
       label: type.label,
       value: type.name,
     })) ?? [];
-    if (!data.multiple) {
-      options.splice(0, 0, {
-        disabled: !data.allow_null,
-        label: __('None', '@@text_domain'),
-        value: '',
-      });
-    }
+
     return options;
   }, [data.allow_null, data.select_filter, postTypes, currentPost]);
+
+  const handleChange = React.useCallback((value: Value) => {
+    onChange(value)
+  }, [data.multiple, onChange])
 
   return (
     <BaseControl
       id={data.name ?? ''}
       label={data.label}
     >
-      {(!!data.multiple) ? (
-        <SelectControl<string[]>
-          multiple
-          style={{
-            height: getMultiSelectHeight(Math.min(10, options.length)),
-          }}
-          value={forceArray(normalizedValue)}
-          options={options}
-          onChange={onChange}
-        />
-      ) : (
-        <SelectControl<string>
-          value={forceSingularValue(normalizedValue)}
-          options={options}
-          onChange={onChange}
-        />
-      )}
+      <SelectControl
+        label={__('Select type', '@@text_domain')}
+        allowNull={!!data.allow_null}
+        multiple={!!data.multiple}
+        value={value}
+        options={options}
+        onChange={handleChange}
+      />
     </BaseControl>
   );
 }

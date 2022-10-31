@@ -1,81 +1,51 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { ControlOptions, SelectOption } from '../types';
-import { BaseControl, SelectControl } from '@wordpress/components';
+import { ControlOptions, SelectOption, Value } from '../types';
+import { BaseControl, ComboboxControl, Button } from '@wordpress/components';
 import { useCurrentPost, usePosts } from '../hooks';
 import { forceArray, forceSingularValue, getMultiSelectHeight } from '../utils';
+import { SelectControl } from './SelectControl';
 
 type Props = {
-  value: number | number[] | string | string[];
+  allowReset?: boolean
+  value?: Value
   data: ControlOptions;
-  onChange: (value: number | number[]) => void;
+  onChange: (value: Value) => void;
 }
 
-export const SelectPostControl: React.FC<Props> = ({ value, data, onChange }) => {
+export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, onChange }) => {
   const currentPost = useCurrentPost();
   const posts = usePosts(data.select_type ?? 'post');
-  const normalizedValue = React.useMemo(() => {
-    if (value) {
-      if (Array.isArray(value)) {
-        return value.map(v => typeof v === 'string' ? v : String(v));
-      }
-      return String(value);
-    }
-    return '';
-  }, [value]);
   const options = React.useMemo(() => {
     const options = posts?.filter((entry) => {
       if (data.select_filter) {
         return !!eval(data.select_filter);
       }
       return true;
-    }).map<SelectOption>(post => ({
-      disabled: false,
+    }).map(post => ({
       label: post.title.rendered,
-      value: String(post.id),
+      value: post.id,
     })) ?? [];
-    if (!data.multiple) {
-      options.splice(0, 0, {
-        disabled: !data.allow_null,
-        label: __('None', '@@text_domain'),
-        value: '',
-      });
-    }
     return options;
   }, [data.allow_null, data.select_filter, posts, currentPost]);
 
-  const onSingleValueChange = React.useCallback((value: string) => {
-    onChange(value ? parseInt(value, 10) : -1);
-  }, [onChange]);
-
-  const onMultipleValueChange = React.useCallback((value: string[]) => {
-    onChange(value.map(v => parseInt(v, 10)));
-  }, [onChange]);
+  const handleChange = React.useCallback((value: Value) => {
+    onChange(value)
+  }, [data.multiple, onChange])
 
   return (
     <BaseControl
       id={data.name ?? ''}
       label={data.label}
     >
-      {(!!data.multiple) ? (
-        <SelectControl<string[]>
-          multiple
-          style={{
-            height: getMultiSelectHeight(Math.min(10, options.length))
-          }}
-          placeholder={__('Select posts', '@@text_domain')}
-          value={forceArray(normalizedValue)}
-          options={options}
-          onChange={onMultipleValueChange}
-        />
-      ) : (
-        <SelectControl<string>
-          placeholder={__('Select post', '@@text_domain')}
-          value={forceSingularValue(normalizedValue)}
-          options={options}
-          onChange={onSingleValueChange}
-        />
-      )}
+      <SelectControl
+        label={__('Select post', '@@text_domain')}
+        allowNull={!!data.allow_null}
+        multiple={!!data.multiple}
+        value={value}
+        options={options}
+        onChange={handleChange}
+      />
     </BaseControl>
   );
 }
