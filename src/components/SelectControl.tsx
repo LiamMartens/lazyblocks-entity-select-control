@@ -97,7 +97,9 @@ export const SelectControl = ({
         </div>
       ))}
       <Flex gap={2}>
-        <Button variant="primary" isSmall onClick={handleAdd}>{__('Add', '@@text_domain')}</Button>
+        {(!!multiple || normalizedValue.length === 0) && (
+          <Button variant="primary" isSmall onClick={handleAdd}>{__('Add', '@@text_domain')}</Button>
+        )}
         {!!createLink && (
           <Button variant="secondary" isSmall href={createLink}>{__('Create new', '@@text_domain')}</Button>
         )}
