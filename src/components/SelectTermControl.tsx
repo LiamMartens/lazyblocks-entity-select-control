@@ -32,6 +32,10 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
     onChange(value)
   }, [data.multiple, onChange])
 
+  const handleEdit = React.useCallback((value: Value) => {
+    window.open(`/wp-admin/term.php?taxonomy=${data.select_type}&tag_ID=${value}`)
+  }, [data.select_type])
+
   return (
     <BaseControl
       id={data.name ?? ''}
@@ -39,6 +43,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
     >
       <SelectControl
         numeric
+        canEdit
         label={__('Select term', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}
@@ -46,6 +51,7 @@ export const SelectTermControl: React.FC<Props> = ({ value, data, onChange }) =>
         value={value}
         options={options}
         onChange={handleChange}
+        onEdit={handleEdit}
       />
     </BaseControl>
   );

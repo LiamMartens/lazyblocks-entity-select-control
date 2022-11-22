@@ -9,6 +9,7 @@ type Props = {
   allowNull?: boolean
   createLink?: string
   multiple?: boolean
+  canEdit?: boolean
   label?: string
   value?: Value
   options: {
@@ -16,6 +17,7 @@ type Props = {
     value: number | string
   }[]
   onChange: (value: Value) => void
+  onEdit?: (value: Value) => void
 }
 
 export const SelectControl = ({
@@ -23,10 +25,12 @@ export const SelectControl = ({
   allowNull,
   createLink,
   multiple,
+  canEdit,
   label,
   value,
   options,
-  onChange
+  onChange,
+  onEdit,
 }: Props) => {
   const EMPTY_VALUE = useMemo(() => numeric ? -1 : '', [numeric])
   const normalizedValue = useMemo(() => {
@@ -56,13 +60,18 @@ export const SelectControl = ({
 
   const handleAdd = useCallback(() => {
     onChange([...normalizedValue, EMPTY_VALUE]);
-  }, [onChange])
+  }, [normalizedValue, onChange])
 
   const handleRemove = useCallback((index: number) => {
     const nextValue = [...normalizedValue]
     nextValue.splice(index, 1)
     onChange(nextValue)
-  }, [onChange])
+  }, [normalizedValue, onChange])
+
+  const handleEdit = useCallback((index: number) => {
+    const id = normalizedValue[index]
+    onEdit?.(id)
+  }, [normalizedValue])
 
   return (
     <Flex direction="column">
@@ -72,7 +81,7 @@ export const SelectControl = ({
           style={{
             display: 'grid',
             gap: '0.5rem',
-            gridTemplateColumns: 'minmax(0, 1fr) auto',
+            gridTemplateColumns: 'minmax(0, 1fr) auto auto',
             alignItems: 'flex-end',
           }}
         >
@@ -83,6 +92,16 @@ export const SelectControl = ({
             options={comboboxOptions}
             onChange={v => handleChange(v, index)}
           />
+          {!!canEdit && (
+            <Button
+              isSmall
+              style={{ marginBottom: '0.7rem' }}
+              variant="primary"
+              onClick={() => handleEdit(index)}
+            >
+              {__('Edit', '@@text_domain')}
+            </Button>
+          )}
           {multiple && (
             <Button
               isDestructive

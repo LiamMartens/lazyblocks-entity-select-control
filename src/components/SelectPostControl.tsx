@@ -33,6 +33,10 @@ export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, on
     onChange(value)
   }, [data.multiple, onChange])
 
+  const handleEdit = React.useCallback((value: Value) => {
+    window.open(`/wp-admin/post.php?post=${value}&action=edit`)
+  }, [data.select_kind, data.select_type])
+
   return (
     <BaseControl
       id={data.name ?? ''}
@@ -40,6 +44,7 @@ export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, on
     >
       <SelectControl
         numeric
+        canEdit
         label={__('Select post', '@@text_domain')}
         allowNull={!!data.allow_null}
         multiple={!!data.multiple}
@@ -47,6 +52,7 @@ export const SelectPostControl: React.FC<Props> = ({ allowReset, value, data, on
         value={value}
         options={options}
         onChange={handleChange}
+        onEdit={handleEdit}
       />
     </BaseControl>
   );
